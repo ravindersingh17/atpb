@@ -10,8 +10,9 @@ from hashlib import md5
 import hmac
 import json
 from urllib.parse import parse_qs
+import asyncio, aiohttp
 
-PORT = 60001
+PORT = 2500
 LOG_FILE = "/var/log/atpbd.log"
 MAX_INACTIVE = 1800
 CHECK_SERVER = "8.8.8.8"
@@ -19,36 +20,40 @@ ACCESS_FILE = "/var/run/atpbd/lastactivity.dat"
 TPB_HOOK = "https://w00t.in/tpbhook.php"
 SECRET_FILE = "/etc/tpbtowoot.secret"
 
-
-class AtpbDaemon(Daemon):
+#Removed Daemon, do not fork for testing
+class AtpbDaemon():
 
     def __init__(self, pidfile):
-        super().__init__(pidfile)
+        #super().__init__(pidfile)
         logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
 
     async def client(self, reader, writer):
         while True:
             data = await reader.readline()
-            self.process(data)
-            writer.write("OK")
+            if not data:
+                break
+            foo = self.process(data)
+            writer.write(foo + b"\r\n")
 
     def run(self):
-        loop = syncio.get_event_loop()
+        loop = asyncio.get_event_loop()
         server = asyncio.start_server(self.client, host=None, port=PORT)
-        loop.run_until_complete(server)
+        loop.run_until_complete(asyncio.gather(server, self.check_activity()))
         loop.run_forever()
 
-    def process(self):
-        pass
+    def process(self, data):
+        return data
 
 
-    def check_activity(self):
+    async def check_activity(self):
+        lastchecked = 0
 
-        if time.time() - lastchecked > 300:
-            logging.info("Now checking if we have been inactive")
-            lastchecked = time.time()
+        if time.time() - lastchecked < 300:
+            logging.info("Less than 5 minutes have passed since we last checked")
+            return
 
-        time.sleep(.1)
+        lastchecked = time.time()
+
         """
         Check when we were last online. Announce we are online if time is >threshold
         Put in place so we can check if VM was resumed, intead of restarted
@@ -61,15 +66,13 @@ class AtpbDaemon(Daemon):
 
         if time.time() - lastactivity > MAX_INACTIVE:
             inactive = True
-
-        logging.info("We have been inactive")
+            logging.info("We have been inactive")
 
         online = False
         try:
-            socket.setdefaulttimeout(5)
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((CHECK_SERVER, 53))
+            reader, writer = await asyncio.open_connection(host=CHECK_SERVER, port=53)
             online = True
-        except:
+        except Exception:
             logging.info("we are offline")
         if online:
             logging.info("We are online")
@@ -77,9 +80,10 @@ class AtpbDaemon(Daemon):
             f.write(str(time.time()))
             f.close()
             if inactive:
-                self.announce_online()
+                logging.info("Here we will anounce we are online")
+                await self.announce_online()
 
-    def announce_online(self):
+    async def announce_online(self):
         logging.info("Announcing online status")
         message = "tpb server online"
         tpbrecipient = "all"
@@ -92,7 +96,13 @@ class AtpbDaemon(Daemon):
         signature = hmac.new(secret, payload, sha1).hexdigest()
         headers = {"Content-Type": "application/json", "X-Tpb-Signature": signature}
         try:
-            r = requests.post(TPB_HOOK, data=payload, headers=headers)
-            logging.info("Hook returned {}".format(r.text))
+            async with aiohttp.ClientSession() as session:
+                async with session.post(TPB_HOOK, data=payload, headers=headers) as resp:
+                    logging.info("Hook returned {}".format(await resp.text()))
         except Exception as e:
             logging.critical("error: {}".format(e))
+
+##DEBUG REMOVE THIS
+if __name__ == "__main__":
+    d = AtpbDaemon("/var/run/atpbd/atpbd.pid")
+    d.run()

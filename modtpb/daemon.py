@@ -2,6 +2,7 @@
 
 import sys, os, time, atexit
 from signal import SIGTERM, SIGHUP
+import logging
 
 class Daemon:
     """
@@ -59,7 +60,11 @@ class Daemon:
         # write pidfile
         atexit.register(self.delpid)
         pid = str(os.getpid())
-        open(self.pidfile,'w+').write("%s\n" % pid)
+        try:
+            open(self.pidfile,'w+').write("%s\n" % pid)
+        except Exception:
+            logging.critical("Unable to open pidfile")
+            sys.exit(1)
 
     def delpid(self):
         os.remove(self.pidfile)
