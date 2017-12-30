@@ -1,0 +1,35 @@
+#!/bin/env python3
+from modtpb import piratebay
+import argparse
+
+import sys, platform, subprocess
+
+def copytoclip(text):
+    clipcommand = "xclip -i -selection clipboard" if platform.system() == "Linux" else "clip"
+    subprocess.run("echo \"{0}\" | {1}".format(text, clipcommand), shell=True)
+
+
+def main(term):
+    searches = list(piratebay.getsearches(term))
+
+    maxlen = max(len(x['text']) for x in searches)
+
+    for idx, s in enumerate(searches):
+        print(s['text'])
+
+    for idx,s in enumerate(searches):
+        print(str(idx).ljust(3), end="")
+        print(s['text'].ljust(maxlen + 2), end = "")
+        print(s['size'].ljust(15), end="")
+        print(s['seeders'][0] + '/' + s['seeders'][1])
+
+    tnum = int(input("Enter torrent number to download:"))
+    magnet = piratebay.gettorrent(searches[tnum]['link'])
+    copytoclip(magnet)
+    print("Copied magnet link to clipboard")
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(description='Process torrent')
+    parser.add_argument('search', help='String to search')
+    args = parser.parse_args()
+    main(args.search)
