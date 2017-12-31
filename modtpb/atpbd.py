@@ -33,7 +33,7 @@ class AtpbDaemon():
             if not data:
                 break
             foo = self.process(data)
-            writer.write(foo + b"\r\n")
+            writer.write(foo)
 
     def run(self):
         loop = asyncio.get_event_loop()
@@ -103,6 +103,3 @@ class AtpbDaemon():
             logging.critical("error: {}".format(e))
 
 ##DEBUG REMOVE THIS
-if __name__ == "__main__":
-    d = AtpbDaemon("/var/run/atpbd/atpbd.pid")
-    d.run()

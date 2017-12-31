@@ -16,5 +16,12 @@ def main(arg):
     else:
         print("Invalid option")
 
-if __name__ == '__main__':
-    main(sys.argv[1])
+#if __name__ == '__main__':
+#    main(sys.argv[1])
+
+def run():
+    d = AtpbDaemon("/var/run/atpbd/atpbd.pid")
+    d.run()
+
+if __name__ == "__main__":
+    run()
