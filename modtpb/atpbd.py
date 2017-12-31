@@ -16,7 +16,7 @@ PORT = 2500
 LOG_FILE = "/var/log/atpbd.log"
 MAX_INACTIVE = 1800
 CHECK_SERVER = "8.8.8.8"
-ACCESS_FILE = "/var/run/atpbd/lastactivity.dat"
+ACCESS_FILE = "/tmp/lastactivity.dat"
 TPB_HOOK = "https://w00t.in/tpbhook.php"
 SECRET_FILE = "/etc/tpbtowoot.secret"
 
@@ -60,7 +60,7 @@ class AtpbDaemon():
         """
         inactive = False
         try:
-            lastactivity = int(open(ACCESS_FILE).read())
+            lastactivity = float(open(ACCESS_FILE).read())
         except FileNotFoundError:
             lastactivity = 0
 
