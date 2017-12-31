@@ -41,13 +41,20 @@ async def process_message(bot, event, command):
             tpbonline = False
             await bot.coro_send_message(event.conv.id_, "Checking if tpb is online")
             try:
-                reader, writer = asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
-                tpbonline = True
+                reader, writer = await asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
+                await writer.write(b"HELO")
+                response = await asyncio.wait_for(reader.readline(), 20)
+                assert response.strip() == b"HELO"
             except Exception:
                 await bot.coro_send_message(event.conv.id_, "tpb is offline, starting the server")
+            else:
+                tpbonline = True
 
             if not tpbonline:
                 await bot.coro_send_message(event.conv.id_, "Here is where we will start the server")
+            else:
+                await bot.coro_send_message(event.conv.id_, "tpb is online")
+
 
 
 
