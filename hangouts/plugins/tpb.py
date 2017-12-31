@@ -4,9 +4,10 @@ import hangups
 
 import plugins
 import re
-
+import asyncio
 logger = logging.getLogger(__name__)
-
+TPB_HOST = "w00t.in"
+TPB_PORT = 8085
 
 def _initialise(bot):
 
@@ -37,5 +38,16 @@ async def process_message(bot, event, command):
                 await bot.coro_send_message(conv, "New tpb user {} registered".format(event.user.full_name))
         else:
             # Check if tpb is online
+            tpbonline = False
             await bot.coro_send_message(event.conv.id_, "Checking if tpb is online")
+            try:
+                reader, writer = asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
+                tpbonline = True
+            except Exception:
+                await bot.coro_send_message(event.conv.id_, "tpb is offline, starting the server")
+
+            if not tpbonline:
+                await bot.coro_send_message(event.conv.id_, "Here is where we will start the server")
+
+
 
