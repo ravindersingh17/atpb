@@ -42,7 +42,7 @@ async def process_message(bot, event, command):
             await bot.coro_send_message(event.conv.id_, "Checking if tpb is online")
             try:
                 reader, writer = await asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
-                await writer.write(b"HELO\r\n")
+                writer.write(b"HELO\r\n")
                 response = await asyncio.wait_for(reader.readline(), 20)
                 assert response.strip() == b"HELO"
             except asyncio.TimeoutError:
