@@ -43,7 +43,10 @@ class AtpbDaemon():
         loop.run_forever()
 
     def process(self, data):
-        return data
+        if data.strip() == b"HELO":
+            return data
+        else:
+            return b"Command registered " + data
 
 
     async def check_activity(self):
