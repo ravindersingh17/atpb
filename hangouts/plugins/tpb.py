@@ -76,7 +76,7 @@ async def send_to_tpb(message):
     try:
         reader, writer = await asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
         writer.write(message.encode("utf-8") + b"\r\n")
-        response = await asyncio.wait_for(reader.readline())
+        response = await asyncio.wait_for(reader.readline(), 20)
         return response.decode("utf-8")
     except asyncio.TimeoutError:
         return "Timed out, make sure tpb is online"
