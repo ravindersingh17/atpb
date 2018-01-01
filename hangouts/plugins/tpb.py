@@ -59,14 +59,30 @@ async def process_message(bot, event, command):
                 await bot.coro_send_message(event.conv.id_, "Starting the server")
                 output = await execcommand('ssh {}@{} -p {} "vbox start \\\"Ubuntu Server VM\\\""'.format(SSH_USER, TPB_HOST, SSH_PORT))
                 await bot.coro_send_message(event.conv.id_, "Started the tpb server, server reply: {}".format(output))
+                await bot.coro_send_message(event.conv.id_, "Wait for the server's message to inform you of online status")
             else:
-                await bot.coro_send_message(event.conv.id_, "tpb is online")
+                await bot.coro_send_message(event.conv.id_, "tpb is online, sending command")
+                response = await send_to_tpb("{} {}".format(event.conv.id_, event.text[4:]))
+                await bot.coro_send_message(event.conv.id_, response)
+
 
 async def execcommand(command):
     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
     while p.poll() is None:
         asyncio.sleep(.1)
     return p.stdout.read().decode("utf-8")
+
+async def send_to_tpb(message):
+    try:
+        reader, writer = await asyncio.wait_for(asyncio.open_connection(host=TPB_HOST, port=TPB_PORT), 10)
+        writer.write(message.encode("utf-8") + b"\r\n")
+        response = await asyncio.wait_for(reader.readline())
+        return response.decode("utf-8")
+    except asyncio.TimeoutError:
+        return "Timed out, make sure tpb is online"
+    except Exception:
+        return "Unknown error"
+
 
 
 
