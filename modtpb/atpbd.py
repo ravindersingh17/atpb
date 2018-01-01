@@ -11,6 +11,7 @@ import hmac
 import json
 from urllib.parse import parse_qs
 import asyncio, aiohttp
+import subprocess
 
 PORT = 2500
 LOG_FILE = "/var/log/atpbd.log"
@@ -106,30 +107,34 @@ class AtpbDaemon():
             connected = False
             try:
                 reader, writer = await asyncio.wait_for(asyncio.open_connection(host="w00t.in", port=8085), 10)
-                if reader is None or writer is None:
-                    print("F'ed up")
-                writer.write(b"HELO\r\n")
+                writer.write(b"HELO1\r\n")
                 response = await asyncio.wait_for(reader.readline(), 10)
-                assert response.strip() == b"HELO"
+                print("Response {}".format(response))
+                logging.debug("Response {}".format(response))
+                assert response.strip() == b"HELO1"
                 connected = True
             except asyncio.TimeoutError:
-                print("Timed out")
+                logging.debug("Timed out")
             except Exception as e:
-                print("Error {}".format(e))
+                logging.debug("Error {}".format(e))
 
             if not connected:
-                print("Not connected")
-                await execcommand("pkill autossh")
-                await asyncio.sleep(2)
-                await execcommand("autossh -M 20004 -f -N ubuntu@w00t.in -R 8085:localhost:2500 -C")
+                logging.debug("Not connected no response from woot")
+                await self.execcommand("pkill autossh")
+                logging.debug("Executed pkill")
+                await self.execcommand("autossh -M 20004 -f -N ubuntu@w00t.in -R 8085:localhost:2500 -C")
+                logging.debug("Sleep a bit")
+                await asyncio.sleep(10)
             else:
-                print("We are connected")
+                logging.debug("We are connected")
 
             await asyncio.sleep(20)
 
     async def execcommand(self, command):
+        logging.debug("Executing {}".format(command))
         p = subprocess.Popen(command, shell=True)
         while p.poll() is None:
+            logging.debug("Awaiting command to finish")
             await asyncio.sleep(.1)
         return p.wait()
 
