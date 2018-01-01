@@ -5,9 +5,11 @@ import hangups
 import plugins
 import re
 import asyncio
+import subprocess
 logger = logging.getLogger(__name__)
 TPB_HOST = "w00t.in"
 TPB_PORT = 8085
+SSH_PORT = 8082
 
 def _initialise(bot):
 
@@ -54,9 +56,15 @@ async def process_message(bot, event, command):
 
             if not tpbonline:
                 await bot.coro_send_message(event.conv.id_, "Here is where we will start the server")
+                await execcommand("ssh {} -p {} vbox start \"Ubuntu Server VM\"".fomat(TPB_HOST, SSH_PORT))
+                await bot.coro_send_message(event.conv.id_, "Started the tpb server")
             else:
                 await bot.coro_send_message(event.conv.id_, "tpb is online")
 
-
+async def execcommand(command):
+    p = subprocess.Popen(command, shell=True)
+    while p.poll() is None:
+        asyncio.sleep(.1)
+    return p.wait()
 
 

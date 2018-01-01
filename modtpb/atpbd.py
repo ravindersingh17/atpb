@@ -80,7 +80,6 @@ class AtpbDaemon():
             f.write(str(time.time()))
             f.close()
             if inactive:
-                logging.info("Here we will anounce we are online")
                 await self.announce_online()
 
     async def announce_online(self):
