@@ -80,8 +80,8 @@ async def send_to_tpb(message):
         return response.decode("utf-8")
     except asyncio.TimeoutError:
         return "Timed out, make sure tpb is online"
-    except Exception:
-        return "Unknown error"
+    except Exception as e:
+        return "Unknown error {}".format(e)
 
 
 
