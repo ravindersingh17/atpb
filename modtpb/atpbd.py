@@ -38,7 +38,7 @@ class AtpbDaemon():
     def run(self):
         loop = asyncio.get_event_loop()
         server = asyncio.start_server(self.client, host=None, port=PORT)
-        loop.run_until_complete(asyncio.gather(server, self.check_activity()))
+        loop.run_until_complete(asyncio.gather(server, self.check_activity(), self.repairtunnel()))
         loop.run_forever()
 
     def process(self, data):
@@ -101,5 +101,37 @@ class AtpbDaemon():
                     logging.info("Hook returned {}".format(await resp.text()))
         except Exception as e:
             logging.critical("error: {}".format(e))
+
+    async def repairtunnel(self):
+        while True:
+            connected = False
+            try:
+                reader, writer = await asyncio.wait_for(asyncio.open_connection(host="w00t.in", port=8085), 10)
+                if reader is None or writer is None:
+                    print("F'ed up")
+                writer.write(b"HELO\r\n")
+                response = await asyncio.wait_for(reader.readline(), 10)
+                assert response.strip() == b"HELO"
+                connected = True
+            except asyncio.TimeoutError:
+                print("Timed out")
+            except Exception as e:
+                print("Error {}".format(e))
+
+            if not connected:
+                print("Not connected")
+                await execcommand("pkill autossh")
+                await asyncio.sleep(2)
+                await execcommand("autossh -M 20004 -f -N ubuntu@w00t.in -R 8085:localhost:2500 -C")
+            else:
+                print("We are connected")
+
+            await asyncio.sleep(20)
+
+    async def execcommand(self, command):
+        p = subprocess.Popen(command, shell=True)
+        while p.poll() is None:
+            await asyncio.sleep(.1)
+        return p.wait()
 
 ##DEBUG REMOVE THIS
