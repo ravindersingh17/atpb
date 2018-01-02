@@ -10,7 +10,7 @@ if ($computed_sig != $signature)
 }
 $data = json_decode($payload);
 $message = $data->message;
-$recipient = $data->recipient;
+$recipient = $data->tpbrecipient;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://localhost:16000/1");

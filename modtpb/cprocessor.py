@@ -1,5 +1,6 @@
 import asyncio
 import re
+import piratebay
 
 class cprocessor:
 
@@ -31,7 +32,9 @@ class cprocessor:
                         await self.interface.send_message(command["sender"], "Enter a valid search term")
                         return
                     await self.interface.send_message(command["sender"], "Searching...")
-                    #results = piratebay.getresults(term)
-            await asyncio.sleep(1)
+                    results = piratebay.getsearches(term)
+                    print(results)
+            else:
+                await asyncio.sleep(1)
 
 
