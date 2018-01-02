@@ -1,6 +1,6 @@
 import asyncio
 import re
-import piratebay
+from modtpb import piratebay
 
 class cprocessor:
 
