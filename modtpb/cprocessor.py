@@ -12,6 +12,7 @@ class cprocessor:
 
     def addcommand(self, sender, command):
         self.commands.append({"sender": sender, "command": command})
+        return "Processing command..."
 
     async def processcommand(self):
         if len(self.commands):
@@ -32,4 +33,5 @@ class cprocessor:
                 return
             await self.interface.send_message(command["sender"], "Searching...")
             #results = piratebay.getresults(term)
+
 

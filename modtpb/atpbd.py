@@ -52,8 +52,10 @@ class AtpbDaemon():
         if data.strip() == b"HELO":
             return data
         else:
-            dataparts = data.split(b" ", 1)
-            self.cprocessor.add_command(dataparts[0], dataparts[1])
+            data = data.decode("utf-8")
+            dataparts = data.split(" ", 1)
+            addresult = self.cprocessor.add_command(dataparts[0], dataparts[1])
+            return addresult.encode("utf-8")
 
 
     async def check_activity(self):
