@@ -32,7 +32,7 @@ class cprocessor:
                         await self.interface.send_message(command["sender"], "Enter a valid search term")
                         return
                     await self.interface.send_message(command["sender"], "Searching...")
-                    results = piratebay.getsearches(term)
+                    results = await piratebay.getsearches(term)
                     self.chatstates[command["sender"]] = {"page": 0, "results": results}
                     await self.sendsearches(command["sender"], 0, results)
             else:
