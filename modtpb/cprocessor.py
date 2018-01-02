@@ -41,7 +41,7 @@ class cprocessor:
                     if command["sender"] in self.chatstates:
                         if choice > 0:
                             try:
-                                pagenum = self.chatstates["sender"]["page"]
+                                pagenum = self.chatstates[sender]["page"]
                                 link =  await piratebay.gettorrent(self.chatstates[sender]["results"][pagenum*3 + choice - 1]["link"])
                                 await self.interface.send_message(sender, "Got torrent link. Starting download. Use tpb [p]rogress to view progress")
                                 print(link)
