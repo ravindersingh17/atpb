@@ -33,7 +33,7 @@ class cprocessor:
                         return
                     await self.interface.send_message(command["sender"], "Searching...")
                     results = piratebay.getsearches(term)
-                    self.chatstates[command["sender"]] = {"page"=0, "results" = results}
+                    self.chatstates[command["sender"]] = {"page": 0, "results": results}
                     await self.sendsearches(command["sender"], 0, results)
             else:
                 await asyncio.sleep(1)
@@ -44,6 +44,8 @@ class cprocessor:
             message += "<b>Title:</b>" + results[page*3 + i]["text"] + "<br />"
             message += "<b>Desc: </b>" + results[page*3 + i]["desc"] + "<br />"
             message += "<b>Size: </b>" + results[page*3 + i]["size"] + "<br /><br />"
+
+        print(message)
 
         await self.interface.send_message(sender, message)
 
