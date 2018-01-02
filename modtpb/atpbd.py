@@ -120,11 +120,11 @@ class AtpbDaemon():
             connected = False
             try:
                 reader, writer = await asyncio.wait_for(asyncio.open_connection(host="w00t.in", port=8085), 10)
-                writer.write(b"HELO1\r\n")
+                writer.write(b"HELO\r\n")
                 response = await asyncio.wait_for(reader.readline(), 10)
                 print("Response {}".format(response))
                 logging.debug("Response {}".format(response))
-                assert response.strip() == b"HELO1"
+                assert response.strip() == b"HELO"
                 connected = True
             except asyncio.TimeoutError:
                 logging.debug("Timed out")
