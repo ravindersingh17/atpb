@@ -13,7 +13,7 @@ class cprocessor:
     def addcommand(self, sender, command):
         self.commands.append({"sender": sender, "command": command})
 
-    async def processcommand():
+    async def processcommand(self):
         if len(self.commands):
             command = self.commands.pop(0)
         else:
