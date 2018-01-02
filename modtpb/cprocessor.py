@@ -42,12 +42,14 @@ class cprocessor:
                         if choice > 0:
                             try:
                                 pagenum = self.chatstates["sender"]["page"]
-                                link = piratebay.gettorrent(self.chatstates[sender]["results"][pagenum*3 + choice - 1]["link"])
+                                link =  await piratebay.gettorrent(self.chatstates[sender]["results"][pagenum*3 + choice - 1]["link"])
+                                await self.interface.send_message(sender, "Got torrent link. Starting download. Use tpb [p]rogress to view progress")
+                                print(link)
                             except IndexError:
                                 self.interface.send_message(sender, "Invalid choice")
                         if choice == 0:
                             self.chatstates[sender]["page"] += 1
-                            self.sendsearches(sender, self.chatstates[sender]["page"], self.chatstates[sender]["results"])
+                            await self.sendsearches(sender, self.chatstates[sender]["page"], self.chatstates[sender]["results"])
             else:
                 await asyncio.sleep(1)
 
