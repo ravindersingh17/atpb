@@ -54,7 +54,7 @@ class AtpbDaemon():
         else:
             data = data.decode("utf-8")
             dataparts = data.split(" ", 1)
-            addresult = self.cprocessor.add_command(dataparts[0], dataparts[1])
+            addresult = self.cprocessor.addcommand(dataparts[0], dataparts[1])
             return addresult.encode("utf-8")
 
 
