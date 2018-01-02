@@ -40,7 +40,7 @@ class cprocessor:
 
     async def sendsearches(self, sender, page, results):
         message = ""
-        for i in xrange(3):
+        for i in range(3):
             message += "<b>Title:</b>" + results[page*3 + i]["text"] + "<br />"
             message += "<b>Desc: </b>" + results[page*3 + i]["desc"] + "<br />"
             message += "<b>Size: </b>" + results[page*3 + i]["size"] + "<br /><br />"
