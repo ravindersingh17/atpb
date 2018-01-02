@@ -5,6 +5,7 @@ import logging
 import time
 import requests
 from modtpb.daemon import Daemon
+from modtpb.cprocessor import cprocessor
 from hashlib import sha1
 from hashlib import md5
 import hmac
@@ -12,6 +13,7 @@ import json
 from urllib.parse import parse_qs
 import asyncio, aiohttp
 import subprocess
+
 
 PORT = 2500
 LOG_FILE = "/var/log/atpbd.log"
@@ -27,6 +29,7 @@ class AtpbDaemon():
     def __init__(self, pidfile):
         #super().__init__(pidfile)
         logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
+        self.cprocessor = cprocessor(self)
 
     async def client(self, reader, writer):
         while True:
@@ -87,10 +90,10 @@ class AtpbDaemon():
                 await self.announce_online()
 
     async def announce_online(self):
-        logging.info("Announcing online status")
-        message = "tpb server online"
-        tpbrecipient = "all"
-        payload = json.dumps({"message": message, "tpbrecipient": tpbrecipient}).encode("utf-8")
+        await self.send_message("all", "tpb server online")
+
+    async def send_message(self, recipient, message):
+        payload = json.dumps({"message": message, "tpbrecipient": recipient}).encode("utf-8")
         try:
             secret = open(SECRET_FILE).read().strip().encode("utf-8")
         except FileNotFoundError:
@@ -104,6 +107,7 @@ class AtpbDaemon():
                     logging.info("Hook returned {}".format(await resp.text()))
         except Exception as e:
             logging.critical("error: {}".format(e))
+
 
     async def repairtunnel(self):
         while True:

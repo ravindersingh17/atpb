@@ -10,13 +10,14 @@ if ($computed_sig != $signature)
 }
 $data = json_decode($payload);
 $message = $data->message;
+$recipient = $data->recipient;
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, "https://localhost:16000/1");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("to" => "tpb", "tpbrecipient" => "all", "message" => $message)));
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("to" => "tpb", "tpbrecipient" => $recipient, "message" => $message)));
 curl_setopt($ch, CURLOPT_POST, 1);
 $result = curl_exec($ch);
 
