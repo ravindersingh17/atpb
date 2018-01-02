@@ -32,5 +32,6 @@ class cprocessor:
                         return
                     await self.interface.send_message(command["sender"], "Searching...")
                     #results = piratebay.getresults(term)
+            await asyncio.sleep(1)
 
 
