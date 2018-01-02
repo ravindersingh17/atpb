@@ -27,7 +27,6 @@ async def getsearches(search):
     returnData = []
     for i in range(len(links)):
         detail = re.search("Uploaded\s*(.*?), Size\s*(.*?), ULed by (.*)", desc[i].text)
-        print(detail.group(1), detail.group(2), detail.group(3))
         returnData.append({
                 'text': links[i].text,
                 'date': detail.group(1),
