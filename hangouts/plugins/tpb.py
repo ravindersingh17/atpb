@@ -67,8 +67,7 @@ async def process_message(bot, event, command):
     else:
         if re.match("\d*", event.text.strip()):
             response = await send_to_tpb("{} {}".format(event.conv.id_, event.text))
-            await bot.coro_send_message(event.conv.id_, response
-                    await bot.coro_send_message(event.conv.id_, response))
+            await bot.coro_send_message(event.conv.id_, response)
 
 
 async def execcommand(command):

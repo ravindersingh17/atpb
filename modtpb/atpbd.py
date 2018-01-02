@@ -42,14 +42,18 @@ class AtpbDaemon():
     def run(self):
         loop = asyncio.get_event_loop()
         server = asyncio.start_server(self.client, host=None, port=PORT)
-        loop.run_until_complete(asyncio.gather(server, self.check_activity(), self.repairtunnel()))
+        loop.run_until_complete(asyncio.gather(server,
+            self.check_activity(),
+            self.repairtunnel(),
+            self.cprocessor.processcommand()))
         loop.run_forever()
 
     def process(self, data):
         if data.strip() == b"HELO":
             return data
         else:
-            return b"Command registered " + data
+            dataparts = data.split(b" ", 1)
+            self.cprocessor.add_command(dataparts[0], dataparts[1])
 
 
     async def check_activity(self):
