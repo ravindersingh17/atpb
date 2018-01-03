@@ -15,7 +15,6 @@ class cprocessor:
 
     def addcommand(self, sender, command):
         self.commands.append({"sender": sender, "command": command})
-        return "Processing command..."
 
     async def processcommand(self):
         while True:
@@ -37,6 +36,13 @@ class cprocessor:
                     results = await piratebay.getsearches(term)
                     self.chatstates[command["sender"]] = {"page": 0, "results": results}
                     await self.sendsearches(command["sender"], 0, results)
+                elif commandparts[0] == "list" or commandparts[0] == "l":
+                    torData = self.tor.getallstatus()
+                    message = ""
+                    for id in torData:
+                        message += "<b>{0}</b> {1}% {2}kb/s {3}<br />".format(id, torData[id][0], torData[1], torData[2])
+                    await self.interface.send_message(command["sender"], message)
+
                 if re.match("\d+", command["command"].strip()):
                     choice = int(command["command"])
                     sender = command["sender"]
@@ -59,7 +65,7 @@ class cprocessor:
         message = ""
         for i in range(3):
             if page*3 + i >= len(results):
-                continue
+                break
             message += "<b>{}</b><br />".format(i + 1)
             message += "<b>Title:</b>" + results[page*3 + i]["text"] + "<br />"
             message += "<b>Size: </b>" + results[page*3 + i]["size"] + "<br />"
