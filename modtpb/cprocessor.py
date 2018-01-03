@@ -41,7 +41,10 @@ class cprocessor:
                     message = ""
                     for id in torData:
                         message += "<b>{0}</b> {1}% {2}kb/s {3}<br />".format(id, torData[id][0], torData[1], torData[2])
-                    await self.interface.send_message(command["sender"], message)
+                    if message == "":
+                        await self.interface.send_message(command["sender"], "No torrents in queue")
+                    else:
+                        await self.interface.send_message(command["sender"], message)
 
                 if re.match("\d+", command["command"].strip()):
                     choice = int(command["command"])
@@ -51,8 +54,8 @@ class cprocessor:
                             try:
                                 pagenum = self.chatstates[sender]["page"]
                                 link =  await piratebay.gettorrent(self.chatstates[sender]["results"][pagenum*3 + choice - 1]["link"])
-                                await self.interface.send_message(sender, "Got torrent link. Starting download. Use tpb [p]rogress to view progress")
-                                self.tor.add(link)
+                                await self.interface.send_message(sender, "Got torrent link. Starting download. Use tpb [l]ist to view progress")
+                                self.tor.add(link, sender)
                             except IndexError:
                                 self.interface.send_message(sender, "Invalid choice")
                         if choice == 0:
