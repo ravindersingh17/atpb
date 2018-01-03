@@ -13,6 +13,7 @@ import json
 from urllib.parse import parse_qs
 import asyncio, aiohttp
 import subprocess
+import signal
 
 
 PORT = 2500
@@ -30,6 +31,8 @@ class AtpbDaemon():
         #super().__init__(pidfile)
         logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
         self.cprocessor = cprocessor(self)
+        signal.signal(signal.SIGINT, self.cleanup)
+        signal.signal(signal.SIGTERM, self.cleanup)
 
     async def client(self, reader, writer):
         while True:
@@ -42,18 +45,19 @@ class AtpbDaemon():
     def run(self):
         loop = asyncio.get_event_loop()
         server = asyncio.start_server(self.client, host=None, port=PORT)
-        loop.run_until_complete(asyncio.gather(server,
-            self.check_activity(),
-            self.repairtunnel(),
-            self.cprocessor.processcommand()))
         try:
+            loop.run_until_complete(asyncio.gather(server,
+                self.check_activity(),
+                self.repairtunnel(),
+                self.cprocessor.processcommand()))
             loop.run_forever()
         except KeyboardInterrupt:
             self.cleanup()
             sys.exit(0)
 
-    def cleanup(self)
+    def cleanup(self):
         print("Here we will cleanup")
+        logging.info("Exit ccalled cleaning up")
         sys.exit(0)
 
     def process(self, data):

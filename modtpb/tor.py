@@ -2,9 +2,10 @@ import libtorrent as lt
 import os
 
 class Tor:
-
-    self.downloads = {}
-    self.save_path = os.path.expanduser("~/tor")
+    
+    def __init__(self):
+        self.downloads = {}
+        self.save_path = os.path.expanduser("~/tor")
 
     def add(self, link):
         ses = lt.session()
