@@ -1,11 +1,13 @@
 import asyncio
 import re
 from modtpb import piratebay
+from modtpb.tor import Tor
 
 class cprocessor:
 
     def __init__(self, interface):
         self.interface = interface
+        self.tor = Tor()
         self.downloads = []
         self.commands = []
         self.results = []
@@ -44,7 +46,7 @@ class cprocessor:
                                 pagenum = self.chatstates[sender]["page"]
                                 link =  await piratebay.gettorrent(self.chatstates[sender]["results"][pagenum*3 + choice - 1]["link"])
                                 await self.interface.send_message(sender, "Got torrent link. Starting download. Use tpb [p]rogress to view progress")
-                                print(link)
+                                self.tor.add(link)
                             except IndexError:
                                 self.interface.send_message(sender, "Invalid choice")
                         if choice == 0:
@@ -60,7 +62,8 @@ class cprocessor:
                 continue
             message += "<b>{}</b><br />".format(i + 1)
             message += "<b>Title:</b>" + results[page*3 + i]["text"] + "<br />"
-            message += "<b>Size: </b>" + results[page*3 + i]["size"] + "<br /><br />"
+            message += "<b>Size: </b>" + results[page*3 + i]["size"] + "<br />"
+            message += "<b>S/L: </b>" + results[page*3 + i]["seeders"][0] + "/" + results[page*3 + i]["seeders"][1] + "<br /><br />"
 
         if message == "":
             await self.interface.send_message(sender, "No results")

@@ -61,7 +61,6 @@ async def process_message(bot, event, command):
                 await bot.coro_send_message(event.conv.id_, "Started the tpb server, server reply: {}".format(output))
                 await bot.coro_send_message(event.conv.id_, "Wait for the server's message to inform you of online status")
             else:
-                await bot.coro_send_message(event.conv.id_, "tpb is online, sending command")
                 response = await send_to_tpb("{} {}".format(event.conv.id_, event.text[4:]))
                 await bot.coro_send_message(event.conv.id_, response)
     else:

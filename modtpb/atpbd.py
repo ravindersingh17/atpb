@@ -46,7 +46,15 @@ class AtpbDaemon():
             self.check_activity(),
             self.repairtunnel(),
             self.cprocessor.processcommand()))
-        loop.run_forever()
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            self.cleanup()
+            sys.exit(0)
+
+    def cleanup(self)
+        print("Here we will cleanup")
+        sys.exit(0)
 
     def process(self, data):
         if data.strip() == b"HELO":
