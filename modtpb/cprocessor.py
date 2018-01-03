@@ -40,7 +40,7 @@ class cprocessor:
                     torData = self.tor.getallstatus()
                     message = ""
                     for id in torData:
-                        message += "<b>{0}</b> {1}% {2}kb/s {3}<br />".format(id, torData[id][0], torData[1], torData[2])
+                        message += "<b>{0}</b> {1}% {2}kb/s {3}<br />".format(id, torData[id][0], torData[id][1], torData[id][2])
                     if message == "":
                         await self.interface.send_message(command["sender"], "No torrents in queue")
                     else:
