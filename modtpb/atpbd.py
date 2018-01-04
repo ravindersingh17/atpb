@@ -54,12 +54,12 @@ class AtpbDaemon():
                 ))
             loop.run_forever()
         except KeyboardInterrupt:
-            self.cleanup()
+            self.cleanup(None, None)
             sys.exit(0)
 
-    def cleanup(self):
+    def cleanup(self, signal, frame):
         print("Here we will cleanup")
-        logging.info("Exit ccalled cleaning up")
+        logging.info("Exit called cleaning up")
         sys.exit(0)
 
     def process(self, data):
