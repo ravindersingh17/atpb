@@ -125,7 +125,7 @@ class Tor:
                         "chat": self.downloads[id].chat,
                         "magnet": self.downloads[id].magnet,
                         })
-                elif self.downloads[id].handle.status().state == lt.torrent_state_seeding:
+                elif self.downloads[id].handle.status().state == lt.torrent_state.seeding:
                     self.downloads[id].session.remove_torrent(self.downloads[id].handle)
                     self.downloads[id].completed = True
                     self.downloads[id].session = None
