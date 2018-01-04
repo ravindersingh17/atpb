@@ -49,7 +49,9 @@ class AtpbDaemon():
             loop.run_until_complete(asyncio.gather(server,
                 self.check_activity(),
                 self.repairtunnel(),
-                self.cprocessor.processcommand()))
+                self.cprocessor.processcommand(),
+                self.cprocessor.tor.eventprocess()
+                ))
             loop.run_forever()
         except KeyboardInterrupt:
             self.cleanup()

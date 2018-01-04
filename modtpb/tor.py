@@ -18,7 +18,10 @@ class Tor:
         self.downloads = {}
         self.save_path = os.path.expanduser("~/tor")
         self.save_file = ".atpb"
-        torData = json.loads(open(self.save_file).read())
+        try:
+            torData = json.loads(open(self.save_file).read())
+        except FileNotFoundError:
+            torData = {"completed": [], "running": []}
         for tor in torData["completed"]:
             download = Download()
             download.magnet = tor["magnet"]
