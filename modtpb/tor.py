@@ -125,7 +125,7 @@ class Tor:
                         "chat": self.downloads[id].chat,
                         "magnet": self.downloads[id].magnet,
                         })
-                elif self.downloads[id].handle.status().state == lt.torrent_state.seeding:
+                elif self.downloads[id].handle.status().state == lt.torrent_status.seeding:
                     self.downloads[id].session.remove_torrent(self.downloads[id].handle)
                     self.downloads[id].completed = True
                     self.downloads[id].session = None
@@ -144,7 +144,7 @@ class Tor:
 
                     for alert in alerts:
                         if type(alert) == lt.save_resume_data_alert:
-                            data = lt.bencode(a.resume_data)
+                            data = lt.bencode(alert.resume_data)
                             open(os.path.join(self.save_path, handle.name() + ".resume"), "wb").write(data)
 
                     torrentData["running"].append({
