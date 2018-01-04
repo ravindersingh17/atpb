@@ -50,20 +50,35 @@ class cprocessor:
                 elif commandparts[0] == "pause":
                     if re.match("\d+", commandparts[1].strip()):
                         id = int(commandparts[1].strip())
-                        self.tor.pause(id)
+                        if self.tor.pause(id):
+                            await self.interface.send_message(command["sender"], "Paused torrent")
+                        else:
+                            await self.interface.send_message(command["sender"], "Failed, no such torrent")
                     elif commandparts[1].strip() == "":
                         self.tor.pauseall()
+                        await self.interface.send_message(command["sender"], "Paused all torrents")
                     else:
                         await self.interface.send_message(command["sender"], "Unknown command")
 
                 elif commandparts[0] == "resume":
                     if re.match("\d+", commandparts[1].strip()):
                         id = int(commandparts[1].strip())
-                        self.tor.resume(id)
+                        if self.tor.resume(id):
+                            await self.interface.send_message(command["sender"], "Resumed torrent")
+                        else:
+                            await self.interface.send_message(command["sender"], "Failed, no such torrent")
                     elif commandparts[1].strip() == "":
                         self.tor.resumeall()
+                        await self.interface.send_message(command["sender"], "Resumed all torrents")
                     else:
                         await self.interface.send_message(command["sender"], "Unknown command")
+
+                elif commandparts[0] == "remove":
+                    if not re.match("\d+", commandparts[1].strip()):
+                        await self.interface.send_message(command["sender"], "ID missing")
+                    else:
+                        id = int(commandparts[1].strip())
+                        self.tor.remove(id)
 
                 if re.match("\d+", command["command"].strip()):
                     choice = int(command["command"])

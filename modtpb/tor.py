@@ -2,6 +2,8 @@ import libtorrent as lt
 import os
 import asyncio
 import json
+import shutil
+import subprocess
 
 class Download:
     def __init__(self):
@@ -18,6 +20,8 @@ class Tor:
         self.downloads = {}
         self.save_path = os.path.expanduser("~/tor")
         self.save_file = ".atpb"
+        self.scp_host = "10.0.2.2"
+        self.scp_dir = "/cygdrive/c/Users/ravinder/Downloads/TV/tpb/"
         try:
             torData = json.loads(open(os.path.join(os.path.expanduser(self.save_path), self.save_file)).read())
         except FileNotFoundError:
@@ -30,6 +34,7 @@ class Tor:
             download.chat = tor["chat"]
             download.handle = None
             download.completed = True
+            self.downloads[tor["id"]] = download
 
         for tor in torData["running"]:
             #TODO Use resume data
@@ -73,7 +78,7 @@ class Tor:
         if downloadid not in self.downloads:
             return None
         if self.downloads[downloadid].completed:
-            return (self.downloads[downloadid], 100, 0, "c")
+            return (self.downloads[downloadid].name, 100, 0, "c")
         name = self.downloads[downloadid].name
         status = self.downloads[downloadid].handle.status()
         download = status.progress * 100
@@ -114,6 +119,13 @@ class Tor:
         for id in self.downloads:
             self.resume(id)
 
+    async def scp(self, id):
+        p = subprocess.Popen("scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].name), scp_host, scp_dir))
+        while p.poll() is None:
+            await asyncio.sleep(1)
+        return p.returncode
+
+
     async def eventprocess(self):
         while True:
             torrentData = {"completed": [], "running": []}
@@ -135,6 +147,12 @@ class Tor:
                         "chat": self.downloads[id].chat,
                         "magnet": self.downloads[id].magnet,
                         })
+                    copy_result = await self.scp(id)
+                    if copy_result == 0:
+                        if os.path.isfile(os.path.join(self.save_path, self.downloads[id].name)):
+                            os.unlink(os.path.join(self.save_path, self.downloads[id].name))
+                        else:
+                            shutil.rmtree(os.path.join(self.save_path, self.downloads[id].name))
                 else:
                     handle = self.downloads[id].handle
                     session = self.downloads[id].session
