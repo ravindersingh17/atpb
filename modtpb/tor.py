@@ -31,8 +31,9 @@ class Tor:
             download.handle = None
             download.completed = True
 
-        #TODO Use resume data
-        self.add(tor["magnet"], tor["chat"], tor["id"])
+        for tor in torData["running"]:
+            #TODO Use resume data
+            self.add(tor["magnet"], tor["chat"], tor["id"])
 
     def add(self, link, chat, id = None):
         #Check duplicate torrent
