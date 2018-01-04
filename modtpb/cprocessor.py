@@ -8,6 +8,7 @@ class cprocessor:
     def __init__(self, interface):
         self.interface = interface
         self.tor = Tor()
+        self.tor.interface = self.interface
         self.downloads = []
         self.commands = []
         self.results = []

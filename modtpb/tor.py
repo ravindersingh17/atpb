@@ -22,6 +22,7 @@ class Tor:
         self.save_file = ".atpb"
         self.scp_host = "10.0.2.2"
         self.scp_dir = "/cygdrive/c/Users/ravinder/Downloads/TV/tpb/"
+        self.interface = None
         try:
             torData = json.loads(open(os.path.join(os.path.expanduser(self.save_path), self.save_file)).read())
         except FileNotFoundError:
