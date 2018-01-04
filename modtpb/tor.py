@@ -138,9 +138,7 @@ class Tor:
                         "magnet": self.downloads[id].magnet,
                         })
                 elif self.downloads[id].handle.status().state == lt.torrent_status.seeding:
-                    self.downloads[id].session.remove_torrent(self.downloads[id].handle)
-                    self.downloads[id].completed = True
-                    self.downloads[id].session = None
+                    self.interface.send_message(self.downloads[id].chat, "{} Finished downloading".format(self.downloads[id].name))
                     torrentData["completed"].append({
                         "name": self.downloads[id].name,
                         "id": id,
@@ -149,10 +147,14 @@ class Tor:
                         })
                     copy_result = await self.scp(id)
                     if copy_result == 0:
+                        self.interface.send_message(self.downloads[id].chat, "{} Copied to home server".format(self.downloads[id].name))
                         if os.path.isfile(os.path.join(self.save_path, self.downloads[id].name)):
-                            os.unlink(os.path.join(self.save_path, self.downloads[id].name))
+                            os.unlink(os.path.join(self.save_path, self.downloads[id].handle.name()))
                         else:
-                            shutil.rmtree(os.path.join(self.save_path, self.downloads[id].name))
+                            shutil.rmtree(os.path.join(self.save_path, self.downloads[id].handle.name()))
+                    self.downloads[id].session.remove_torrent(self.downloads[id].handle)
+                    self.downloads[id].completed = True
+                    self.downloads[id].session = None
                 else:
                     handle = self.downloads[id].handle
                     session = self.downloads[id].session
