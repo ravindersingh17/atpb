@@ -157,7 +157,7 @@ class Tor:
             with open(self.save_file, "w") as sfile:
                 sfile.write(json.dumps(torrentData))
 
-            asyncio.sleep(30)
+            await asyncio.sleep(30)
 
 
 
