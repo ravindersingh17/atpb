@@ -19,7 +19,7 @@ class Tor:
         self.save_path = os.path.expanduser("~/tor")
         self.save_file = ".atpb"
         try:
-            torData = json.loads(open(self.save_file).read())
+            torData = json.loads(open(os.path.join(os.path.expanduser(self.save_path), self.save_file)).read())
         except FileNotFoundError:
             torData = {"completed": [], "running": []}
         for tor in torData["completed"]:
@@ -154,7 +154,7 @@ class Tor:
                         "magnet": self.downloads[id].magnet,
                         })
 
-            with open(self.save_file, "w") as sfile:
+            with open(os.path.join(os.path.expanduser(self.save_path), self.save_file), "w") as sfile:
                 sfile.write(json.dumps(torrentData))
 
             await asyncio.sleep(30)
