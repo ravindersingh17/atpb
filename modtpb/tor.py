@@ -114,7 +114,7 @@ class Tor:
         for id in self.downloads:
             self.resume(id)
 
-    def eventprocess(self):
+    async def eventprocess(self):
         while True:
             torrentData = {"completed": [], "running": []}
             for id in self.downloads:
