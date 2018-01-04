@@ -81,6 +81,9 @@ class cprocessor:
                         id = int(commandparts[1].strip())
                         self.tor.remove(id)
 
+                elif commandparts[0] == "help" or commandparts[0] == "h":
+                    await self.interface.send_message(command["sender"], "Type \"tpb s <search term>\" to search. Eg:<br /> \"tpb search youre the worst 4-10\" <br />This searches for Season 4 Episode 10 of You're the worst<br />Type 1, 2 or 3 to choose one of the results or 0 for next page.<br /> That's it")
+
                 if re.match("\d+", command["command"].strip()):
                     choice = int(command["command"])
                     sender = command["sender"]
