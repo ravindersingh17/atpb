@@ -120,7 +120,7 @@ class Tor:
             self.resume(id)
 
     async def scp(self, id):
-        p = subprocess.Popen("scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].name), scp_host, scp_dir))
+        p = subprocess.Popen("scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].name), self.scp_host, self.scp_dir))
         while p.poll() is None:
             await asyncio.sleep(1)
         return p.returncode
