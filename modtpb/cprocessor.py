@@ -15,6 +15,7 @@ class cprocessor:
 
     def addcommand(self, sender, command):
         self.commands.append({"sender": sender, "command": command})
+        return "."
 
     async def processcommand(self):
         while True:
@@ -40,11 +41,29 @@ class cprocessor:
                     torData = self.tor.getallstatus()
                     message = ""
                     for id in torData:
-                        message += "<b>{0}</b> {1}% {2}kb/s {3}<br />".format(id, torData[id][0], torData[id][1], torData[id][2])
+                        message += "<b>{0})</b> {1} {2}% {3:.2f}kb/s {4}<br />".format(id, torData[id][0], torData[id][1], torData[id][2], torData[id][3])
                     if message == "":
                         await self.interface.send_message(command["sender"], "No torrents in queue")
                     else:
                         await self.interface.send_message(command["sender"], message)
+
+                elif commandparts[0] == "pause":
+                    if re.match("\d+", commandparts[1].strip()):
+                        id = int(commandparts[1].strip())
+                        self.tor.pause(id)
+                    elif commandparts[1].strip() == "":
+                        self.tor.pauseall()
+                    else:
+                        await self.interface.send_message(command["sender"], "Unknown command")
+
+                elif commandparts[0] == "resume":
+                    if re.match("\d+", commandparts[1].strip()):
+                        id = int(commandparts[1].strip())
+                        self.tor.resume(id)
+                    elif commandparts[1].strip() == "":
+                        self.tor.resumeall()
+                    else:
+                        await self.interface.send_message(command["sender"], "Unknown command")
 
                 if re.match("\d+", command["command"].strip()):
                     choice = int(command["command"])
