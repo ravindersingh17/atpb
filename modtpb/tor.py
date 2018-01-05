@@ -153,6 +153,8 @@ class Tor:
                             os.unlink(os.path.join(self.save_path, self.downloads[id].handle.name()))
                         else:
                             shutil.rmtree(os.path.join(self.save_path, self.downloads[id].handle.name()))
+                    else:
+                        await self.interface.send_message(self.downloads[id].chat, "Unable to copy to home server")
                     self.downloads[id].session.remove_torrent(self.downloads[id].handle)
                     self.downloads[id].completed = True
                     self.downloads[id].session = None
