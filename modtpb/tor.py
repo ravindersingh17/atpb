@@ -44,8 +44,8 @@ class Tor:
     def add(self, link, chat, id = None):
         #Check duplicate torrent
         parsed_uri = lt.parse_magnet_uri(link)
-        for id in self.downloads:
-            if parsed_uri["name"] == self.downloads[id].name:
+        for eid in self.downloads:
+            if parsed_uri["name"] == self.downloads[eid].name:
                 return False
         download = Download()
         download.magnet = link
