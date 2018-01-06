@@ -6,6 +6,7 @@ import plugins
 import re
 import asyncio
 import subprocess
+from tvmaze import TVMaze
 logger = logging.getLogger(__name__)
 TPB_HOST = "w00t.in"
 TPB_PORT = 8085
@@ -39,6 +40,13 @@ async def process_message(bot, event, command):
             await bot.coro_send_message(event.conv.id_, "tpb user registered")
             for conv in registered_convs:
                 await bot.coro_send_message(conv, "New tpb user {} registered".format(event.user.full_name))
+
+        elif commandparts[1] == "info":
+            if len(commandparts) < 3:
+                await bot.coro_send_message(event.conv.id_, "No data supplied")
+                return
+            data = TVMaze.search(" ".join(commandparts[2:]))
+            await bot.coro_send_message(event.conv.id_, data["summary"] + "<b>Next Episode:</b>" + data["nextepisode"] + "<b>Previous Episode:</b>" + data["previousepisode"])
         else:
             # Check if tpb is online
             tpbonline = False
