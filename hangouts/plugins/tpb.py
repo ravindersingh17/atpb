@@ -46,7 +46,12 @@ async def process_message(bot, event, command):
                 await bot.coro_send_message(event.conv.id_, "No data supplied")
                 return
             data = TVMaze.search(" ".join(commandparts[2:]))
-            await bot.coro_send_message(event.conv.id_, data["summary"] + "<b>Next Episode:</b>" + data["nextepisode"] + "<b>Previous Episode:</b>" + data["previousepisode"])
+            message = data["summary"]
+            if data["nextepisode"]:
+                message += "<br /><b>Next Episode:</b>" + data["nextepisode"]
+            if data["previousepisode"]:
+                message += "<br /><b>Previous Episode:</b>" + data["previousepisode"]
+            await bot.coro_send_message(event.conv.id_, message)
         else:
             # Check if tpb is online
             tpbonline = False
