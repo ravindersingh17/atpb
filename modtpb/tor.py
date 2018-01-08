@@ -126,6 +126,12 @@ class Tor:
             await asyncio.sleep(1)
         return p.returncode
 
+    async def sshencode(self, id):
+        p = subprocess.Popen("ssh {} addtolib \"{}\"".format(self.scp_host, self.downloads[id].handle.name()))
+        while p.poll is None:
+            await asyncio.sleep(1)
+        return p.returncode
+
 
     async def eventprocess(self):
         while True:
@@ -155,6 +161,15 @@ class Tor:
                             shutil.rmtree(os.path.join(self.save_path, self.downloads[id].handle.name()))
                     else:
                         await self.interface.send_message(self.downloads[id].chat, "Unable to copy to home server")
+                        command ="scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].handle.name()))
+                        await self.interface.send_message(self.downloads[id].chat, "scp command was {}".format(command))
+
+                    encode_result = await self.sshencode(id)
+                    if encode_result == 0:
+                        await self.interface.send_message(self.downloads[id].chat, "{} Encoded file and placed it in media library".format(self.downloads[id].name))
+                    else:
+                        await self.interface.send_message(self.downloads[id].chat, "{} Unable to encode file".format(self.downloads[id].name))
+
                     self.downloads[id].session.remove_torrent(self.downloads[id].handle)
                     self.downloads[id].completed = True
                     self.downloads[id].session = None
