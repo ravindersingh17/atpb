@@ -133,9 +133,9 @@ class AtpbDaemon():
         while True:
             connected = False
             try:
-                reader, writer = await asyncio.wait_for(asyncio.open_connection(host="w00t.in", port=8085), 10)
+                reader, writer = await asyncio.wait_for(asyncio.open_connection(host="w00t.in", port=8085), 40)
                 writer.write(b"HELO\r\n")
-                response = await asyncio.wait_for(reader.readline(), 10)
+                response = await asyncio.wait_for(reader.readline(), 40)
                 print("Response {}".format(response))
                 logging.debug("Response {}".format(response))
                 assert response.strip() == b"HELO"

@@ -21,7 +21,7 @@ class Tor:
         self.save_path = os.path.expanduser("~/tor")
         self.save_file = ".atpb"
         self.scp_host = "10.0.2.2"
-        self.scp_dir = "/cygdrive/c/Users/ravinder/Downloads/TV/tpb/"
+        self.scp_dir = "/cygdrive/c/Users/ravinder/medlib/temp/"
         self.interface = None
         try:
             torData = json.loads(open(os.path.join(os.path.expanduser(self.save_path), self.save_file)).read())
@@ -121,13 +121,13 @@ class Tor:
             self.resume(id)
 
     async def scp(self, id):
-        p = subprocess.Popen("scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].handle.name()), self.scp_host, self.scp_dir), shell=True)
+        p = subprocess.Popen("scp -r \"{0}\" {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].handle.name()), self.scp_host, self.scp_dir), shell=True)
         while p.poll() is None:
             await asyncio.sleep(1)
         return p.returncode
 
     async def sshencode(self, id):
-        p = subprocess.Popen("ssh {} addtolib \"{}\"".format(self.scp_host, self.downloads[id].handle.name()))
+        p = subprocess.Popen("ssh {} /usr/local/bin/addtolib \\\"{}\\\"".format(self.scp_host, self.downloads[id].handle.name()), shell=True)
         while p.poll is None:
             await asyncio.sleep(1)
         return p.returncode
@@ -161,14 +161,20 @@ class Tor:
                             shutil.rmtree(os.path.join(self.save_path, self.downloads[id].handle.name()))
                     else:
                         await self.interface.send_message(self.downloads[id].chat, "Unable to copy to home server")
-                        command ="scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].handle.name()))
-                        await self.interface.send_message(self.downloads[id].chat, "scp command was {}".format(command))
+                        try:
+                            command ="scp -r {0} {1}:{2}".format(os.path.join(self.save_path, self.downloads[id].handle.name()), self.scp_host, self.scp_dir)
+                            await self.interface.send_message(self.downloads[id].chat, "scp command was {}".format(command))
+                        except Exception as e:
+                            await self.interface.send_message(self.downloads[id].chat, "Unknown exception {}".format(e))
 
-                    encode_result = await self.sshencode(id)
+                    try:
+                        encode_result = await self.sshencode(id)
+                    except Exception as e:
+                        await self.interface.send_message(self.downloads[id].chat, "Exception {}".format(e))
                     if encode_result == 0:
                         await self.interface.send_message(self.downloads[id].chat, "{} Encoded file and placed it in media library".format(self.downloads[id].name))
                     else:
-                        await self.interface.send_message(self.downloads[id].chat, "{} Unable to encode file".format(self.downloads[id].name))
+                        await self.interface.send_message(self.downloads[id].chat, "{} Unable to encode file. Return code was {}".format(self.downloads[id].name, encode_result))
 
                     self.downloads[id].session.remove_torrent(self.downloads[id].handle)
                     self.downloads[id].completed = True
