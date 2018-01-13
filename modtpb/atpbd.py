@@ -42,12 +42,20 @@ class AtpbDaemon():
             foo = self.process(data)
             writer.write(foo)
 
+    async def control_client(self, reader, writer):
+        while True:
+            status = self.cprocessor.tor.getallstatus()
+            writer.write(str(status).encode("utf-8"))
+            asyncio.sleep(30)
+
     def run(self):
         loop = asyncio.get_event_loop()
         server = asyncio.start_server(self.client, host=None, port=PORT)
+        control_server = asyncio.start_server(self.control_client, host="localhost", port=2501)
         try:
             loop.run_until_complete(asyncio.gather(server,
                 self.check_activity(),
+                control_server,
                 self.repairtunnel(),
                 self.cprocessor.processcommand(),
                 self.cprocessor.tor.eventprocess()

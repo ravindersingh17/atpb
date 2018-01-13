@@ -75,11 +75,12 @@ class cprocessor:
                         await self.interface.send_message(command["sender"], "Unknown command")
 
                 elif commandparts[0] == "remove":
-                    if not re.match("\d+", commandparts[1].strip()):
+                    if not re.match("[\d\s]+", commandparts[1].strip()):
                         await self.interface.send_message(command["sender"], "ID missing")
                     else:
-                        id = int(commandparts[1].strip())
-                        self.tor.remove(id)
+                        for id in map(int, re.findall("\d+", commandparts[1])):
+                            self.tor.remove(id)
+                        await self.interface.send_message(command["sender"], "Torrent(s) removed")
 
                 elif commandparts[0] == "help" or commandparts[0] == "h":
                     await self.interface.send_message(command["sender"], "Type \"tpb register\" to register<br/> \"tpb s <search term>\" to search. Eg:<br /> \"tpb s youre the worst 4-10\" <br />This searches for Season 4 Episode 10 of You're the worst<br />Type 1, 2 or 3 to choose one of the results or 0 for next page.<br /> That's it")
