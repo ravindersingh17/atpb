@@ -44,9 +44,12 @@ class AtpbDaemon():
 
     async def control_client(self, reader, writer):
         while True:
-            status = self.cprocessor.tor.getallstatus()
-            writer.write(str(status).encode("utf-8"))
-            asyncio.sleep(30)
+            data = await reader.readline()
+            if not data:
+                break
+            if data == b"GET":
+                status = self.cprocessor.tor.getallstatus()
+                writer.write(str(status).encode("utf-8"))
 
     def run(self):
         loop = asyncio.get_event_loop()
