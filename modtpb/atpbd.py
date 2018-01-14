@@ -47,7 +47,7 @@ class AtpbDaemon():
             data = await reader.readline()
             if not data:
                 break
-            if data == b"GET":
+            if data.strip() == b"GET":
                 status = self.cprocessor.tor.getallstatus()
                 writer.write(str(status).encode("utf-8"))
 
