@@ -49,7 +49,10 @@ class AtpbDaemon():
                 break
             if data.strip() == b"GET":
                 status = self.cprocessor.tor.getallstatus()
-                writer.write(str(status).encode("utf-8"))
+                message = ""
+                for id in status:
+                    message += "<b>{0})</b> {1} {2:.2f}% {3:.2f}kb/s {4}\r\n".format(id, status[id][0], status[id][1], status[id][2], status[id][3])
+                writer.write(message.encode("utf-8"))
 
     def run(self):
         loop = asyncio.get_event_loop()
