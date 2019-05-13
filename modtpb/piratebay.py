@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as BS
 import aiohttp
 
 async def getsearches(search):
-    SITE = 'https://tpbunblocked.org'
+    SITE = 'baytpb.one'
     results = []
 
     rep = lambda x, y: x + y if len(y) == 2 else x + "0" + y
